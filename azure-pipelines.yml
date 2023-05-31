@@ -8,8 +8,8 @@ trigger:
 
 resources:
   webhooks:
-    - webhook: 
-    connection: supernode-webhook
+    - webhook: test
+      connection: supernode-webhook
 
 pool:
   vmImage: ubuntu-latest
