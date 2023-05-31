@@ -29,3 +29,22 @@ jobs:
         targetType: 'inline'
         script: |
           env
+
+   - task: Bash@3
+      displayName: test webhook
+      env:
+        test: test
+        AWS_REGION: ap-southeast-2
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "zzz ${CPAP} ${CPAP_PASS}"
+          export
+
+    - ${{ each service in parameters.test.services }}:
+      - task: Bash@3
+        displayName: ${{ service.name }}
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo ${{ service.name  }} ${{ service.version  }}
