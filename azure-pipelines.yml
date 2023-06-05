@@ -43,6 +43,7 @@ stages:
               sshKeySecureFile: 'sa_id_rsa'
               addEntryToConfig: true
               configHostname: 'github.com'
+              configHostAlias: 'github.com'
           - task: Bash@3
             displayName: 'echo env'
             inputs:
