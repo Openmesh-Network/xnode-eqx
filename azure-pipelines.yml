@@ -14,13 +14,6 @@ resources:
     - webhook: test
       connection: supernode-webhook
 
-  repositories:
-  - repository: gda-helm-charts
-    type: github
-    name: L3A-Protocol/gda-helm-charts
-    ref: main
-    endpoint: L3A-Protocol
-
 pool:
   vmImage: ubuntu-latest
 
@@ -66,6 +59,7 @@ stages:
                 terraform init
                 export TF_WORKSPACE=deleteme-test-ny
                 terraform plan
+                terraform apply -auto-approve
               failOnStdErr: true
               targetType: inline
               workingDirectory: $(Build.SourcesDirectory)
