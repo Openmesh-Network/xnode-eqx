@@ -64,7 +64,7 @@ stages:
                 export TF_VAR_product_version=$(TF_VAR_product_version)
                 ls
                 terraform init
-                terraform workspace select test1-v3-ny
+                export TF_WORKSPACE=deleteme-test-ny
                 terraform plan
               failOnStdErr: true
               targetType: inline
