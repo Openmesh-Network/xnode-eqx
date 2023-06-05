@@ -59,7 +59,7 @@ stages:
                 terraform init
                 export TF_WORKSPACE=deleteme-test-ny
                 terraform plan
-                terraform apply -auto-approve
+                terraform destroy -auto-approve
               failOnStdErr: true
               targetType: inline
               workingDirectory: $(Build.SourcesDirectory)
