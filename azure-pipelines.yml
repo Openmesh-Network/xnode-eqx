@@ -23,7 +23,8 @@ pool:
 
 stages:
   - stage: terraformPlan
-    pool: vmImage: ubuntu-latest
+    pool: 
+      vmImage: ubuntu-latest
     jobs:
       - job: 'terraformPlan'
         variables:
