@@ -7,7 +7,7 @@ trigger:
 - none
 
 variables:
-  serviceConnectionName: aws-apl
+  - group: temp-eqx-l3a
 
 resources:
   webhooks:
@@ -54,6 +54,14 @@ stages:
               regionName: ap-southeast-2
               scriptType: inline
               inlineScript: |
+                export TF_VAR_auth_token=$(TF_VAR_auth_token)
+                export TF_VAR_aws_role_arn=$(TF_VAR_aws_role_arn)
+                export TF_VAR_bucket=$(TF_VAR_bucket)
+                export TF_VAR_ccm_enabled=$(TF_VAR_ccm_enabled)
+                export TF_VAR_count_x86=$(TF_VAR_count_x86)
+                export TF_VAR_infra_version=$(TF_VAR_infra_version)
+                export TF_VAR_metro=$(TF_VAR_metro)
+                export TF_VAR_product_version=$(TF_VAR_product_version)
                 ls
                 terraform init
                 terraform workspace select test1-v3-ny
