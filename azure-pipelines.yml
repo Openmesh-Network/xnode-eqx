@@ -56,6 +56,8 @@ stages:
               inlineScript: |
                 ls
                 terraform init
+                terraform workspace select test1-v3-ny
+                terraform plan
               failOnStdErr: true
               targetType: inline
               workingDirectory: $(Build.SourcesDirectory)
