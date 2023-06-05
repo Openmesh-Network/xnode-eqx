@@ -6,6 +6,9 @@
 trigger:
 - none
 
+variables:
+  serviceConnectionName: aws-apl
+
 resources:
   webhooks:
     - webhook: test
@@ -44,13 +47,15 @@ stages:
               addEntryToConfig: true
               configHostname: 'github.com'
               configHostAlias: 'github.com'
-          - task: Bash@3
-            displayName: 'echo env'
+          - task: AWSShellScript@1
+            name: assumeRole
             inputs:
-              targetType: 'inline'
-              script: |
-                which terraform
-                terraform version
+              awsCredentials: aws-apl
+              regionName: ap-southeast-2
+              scriptType: inline
+              inlineScript: |
+                ls
                 terraform init
-                terraform workspace select test1-v3-ny
-                terraform plan
+              failOnStdErr: true
+              targetType: inline
+              workingDirectory: $(Build.SourcesDirectory)
