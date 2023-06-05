@@ -1,12 +1,10 @@
 terraform {
   backend "s3" {
-    bucket          = "terraform-data-aws-l3a-global"
-    encrypt         = true
-    key             = "applications/k8s.tfstate"
-    region          = "ap-southeast-2"
-    role_arn        = "arn:aws:iam::849828677909:role/super"
-    #access_key      = "AKIA4LXN4REK5UFFGVOR"
-    #secret_key      = "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"
+    bucket   = "terraform-data-aws-l3a-global"
+    encrypt  = true
+    key      = "applications/k8s.tfstate"
+    region   = "ap-southeast-2"
+    role_arn = "arn:aws:iam::849828677909:role/super"
   }
 }
 
