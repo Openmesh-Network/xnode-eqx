@@ -9,5 +9,5 @@ workloads = {
   metallb_release      = "https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml"
   ingress_controller   = "https://raw.githubusercontent.com/containous/traefik/v1.7/examples/k8s/traefik-ds.yaml"
   nvidia_gpu           = "https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml"
-  extra                = ""
+  extra                = []
 }

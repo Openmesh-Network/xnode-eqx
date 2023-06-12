@@ -47,7 +47,8 @@ variable "metro" {
 
 
 module "multiarch-k8s" {
-  source = "git@github.com:L3A-Protocol/k8s-eqx-module.git?ref=v0.0.2-beta.1"
+  #source = "git@github.com:L3A-Protocol/k8s-eqx-module.git?ref=v0.0.2-beta.1"
+  source = "git@github.com:L3A-Protocol/k8s-eqx-module.git"
 
   auth_token = var.auth_token
   project_id = random_string.project_id.result
