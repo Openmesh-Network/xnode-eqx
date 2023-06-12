@@ -78,8 +78,8 @@ stages:
                 touch kubeconfig
                 terraform init
                 export TF_WORKSPACE=$TF_VAR_client-$TF_VAR_product_version-$TF_VAR_metro
-                terraform plan -var-file=./workload_manifests/${TF_VAR_kubernetes_version}.tfvars -var-file=$(gh_secrets.secureFilePath)
-                terraform apply -auto-approve -var-file=./workload_manifests/${TF_VAR_kubernetes_version}.tfvars -var-file=$(gh_secrets.secureFilePath)
+                terraform plan -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
+                terraform apply -auto-approve -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
               failOnStdErr: true
               targetType: inline
               workingDirectory: $(Build.SourcesDirectory)
