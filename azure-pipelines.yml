@@ -11,7 +11,7 @@ variables:
 
 resources:
   webhooks:
-    - webhook: test
+    - webhook: settings 
       connection: supernode-webhook
 
 parameters:
@@ -24,62 +24,82 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-  - stage: terraformPlan
+  - stage: echoSettings
     pool: 
       vmImage: ubuntu-latest
     jobs:
-      - job: 'terraformPlan'
-        variables:
-          CPAP: ${{ parameters.test.CPAP }}
-          CPAP_PASS: ${{ parameters.test.CPAP_PASS }}
-      
+      - job: 'echoParams'
         steps:
-          - task: TerraformInstaller@0
-            displayName: 'Terraform Installer'
-            inputs:
-              terraformVersion: '1.3.3'
-          - task: InstallSSHKey@0
-            inputs:
-              knownHostsEntry: '|1|EG23y3SuKXlyTqS0XGNoI2m813Y=|2I81dE2GnKqyYBPbLU2eVqCEazk= ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H'
-              sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2d/Br/uztS11ATihf9v4VhDJv1oksh/U1XL4BCghJIovplhOg+n5Ls2hay0Tx3hrCNEpwQ4r5cI2vMxv/7+8ki5ha/Zuwte+fv+PwlDvGnVQWjTnzGRgKKNgW3UYkQjWLbZ97lom+cFfSPLKIe3UelAxl2faf9QtASLdpLYMWdwgAB/2MDFQaKkHloN/vukVnQHtPO9b0SpJKELaIvP3gCsJRo2uP8QcnE/NObOp6ZTD1eehlII/H0blp/gbs7MM+gyRNws5PC+9gjQti1Kr6+78/ewJZyNUCb/c7afhMDAkLjEEuqbmXE+Y/xceYEl2E+uejzzewbUrGOFsKw/wLgAEPT57+lKvojwiE0KYvv0xqgSTsQ3wlLZ7FiFGUAiAXsV7rr2VVYuqojFIovDC4Tl3Fm2deuBRuyJc4SwVE0n8+uPLfjrCECOknKx7UFhMdn9LqzkPWDa1aWkvjTcFZ9HTuc8T1+VVHnBQsSW2BXWzV4l+abuznD+dQYMiB4NE='
-              sshKeySecureFile: 'sa_id_rsa'
-              addEntryToConfig: true
-              configHostname: 'github.com'
-              configHostAlias: 'github.com'
-          - task: DownloadSecureFile@1
-            name: workloads
-            displayName: 'workload tfvars'
-            inputs:
-              secureFile: '1.25.10-00.tfvars'
-          - task: DownloadSecureFile@1
-            name: gh_secrets
-            displayName: 'secrets tfvars'
-            inputs:
-              secureFile: 'gh_secrets.tfvars'
+          - ${{ each build in parameters.settings.builds }}:
+            - task: Bash@3
+              displayName: ''
+              inputs:
+                targetType: 'inline'
+                script: |
+                  echo "${{ build.aws_role_arn }}"
+                  echo "${{ build.ccm_enabled }}"
+                  echo "${{ build.client }}"
+                  echo "${{ build.count_x86 }}"
+                  echo "${{ build.metro }}"
+                  echo "${{ build.product_version }}"
+                  echo "${{ build.kubernetes_version }}"
+                  echo "${{ build.secret_bucket }}"
 
-          - task: AWSShellScript@1
-            name: assumeRole
+  - stage: plan
+    pool: 
+      vmImage: ubuntu-latest
+    jobs:
+      - job: 'stageMustHaveOneJobWithNoDependencies'
+        steps:
+          - task: Bash@3
+            displayName: ''
             inputs:
-              awsCredentials: aws-apl
-              regionName: ap-southeast-2
-              scriptType: inline
-              inlineScript: |
-                export TF_VAR_auth_token=$(TF_VAR_auth_token)
-                export TF_VAR_aws_role_arn=$(TF_VAR_aws_role_arn)
-                export TF_VAR_bucket=$(TF_VAR_bucket)
-                export TF_VAR_ccm_enabled=$(TF_VAR_ccm_enabled)
-                export TF_VAR_count_x86=$(TF_VAR_count_x86)
-                export TF_VAR_metro=$(TF_VAR_metro)
-                export TF_VAR_product_version=$(TF_VAR_product_version)
-                export TF_VAR_kubernetes_version=$(TF_VAR_kubernetes_version)
+              targetType: 'inline'
+              script: |
+                echo "stageMustHaveOneJobWithNoDependencies"
+      - ${{ each build in parameters.settings.builds }}:
+        - job: 'planBuild'
+          steps:
+            - task: TerraformInstaller@0
+              displayName: 'Terraform Installer'
+              inputs:
+                terraformVersion: '1.3.3'
+            - task: InstallSSHKey@0
+              inputs:
+                knownHostsEntry: '|1|EG23y3SuKXlyTqS0XGNoI2m813Y=|2I81dE2GnKqyYBPbLU2eVqCEazk= ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H'
+                sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2d/Br/uztS11ATihf9v4VhDJv1oksh/U1XL4BCghJIovplhOg+n5Ls2hay0Tx3hrCNEpwQ4r5cI2vMxv/7+8ki5ha/Zuwte+fv+PwlDvGnVQWjTnzGRgKKNgW3UYkQjWLbZ97lom+cFfSPLKIe3UelAxl2faf9QtASLdpLYMWdwgAB/2MDFQaKkHloN/vukVnQHtPO9b0SpJKELaIvP3gCsJRo2uP8QcnE/NObOp6ZTD1eehlII/H0blp/gbs7MM+gyRNws5PC+9gjQti1Kr6+78/ewJZyNUCb/c7afhMDAkLjEEuqbmXE+Y/xceYEl2E+uejzzewbUrGOFsKw/wLgAEPT57+lKvojwiE0KYvv0xqgSTsQ3wlLZ7FiFGUAiAXsV7rr2VVYuqojFIovDC4Tl3Fm2deuBRuyJc4SwVE0n8+uPLfjrCECOknKx7UFhMdn9LqzkPWDa1aWkvjTcFZ9HTuc8T1+VVHnBQsSW2BXWzV4l+abuznD+dQYMiB4NE='
+                sshKeySecureFile: 'sa_id_rsa'
+                addEntryToConfig: true
+                configHostname: 'github.com'
+                configHostAlias: 'github.com'
+            - task: DownloadSecureFile@1
+              name: gh_secrets
+              displayName: 'secrets tfvars'
+              inputs:
+                secureFile: 'gh_secrets.tfvars'
 
-                export TF_VAR_client=test2
+            - task: AWSShellScript@1
+              name: terraformPlanApply
+              inputs:
+                awsCredentials: aws-apl
+                regionName: ap-southeast-2
+                scriptType: inline
+                inlineScript: |
+                  export TF_VAR_auth_token="${{ build.auth_token }}"
+                  export TF_VAR_aws_role_arn="${{ build.aws_role_arn }}"
+                  export TF_VAR_ccm_enabled="${{ build.ccm_enabled }}"
+                  export TF_VAR_client="${{ build.client }}"
+                  export TF_VAR_count_x86="${{ build.count_x86 }}"
+                  export TF_VAR_metro="${{ build.metro }}"
+                  export TF_VAR_product_version="${{ build.product_version }}"
+                  export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
+                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
 
-                touch kubeconfig
-                terraform init
-                export TF_WORKSPACE=$TF_VAR_client-$TF_VAR_product_version-$TF_VAR_metro
-                terraform plan -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
-                terraform apply -auto-approve -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
-              failOnStdErr: true
-              targetType: inline
-              workingDirectory: $(Build.SourcesDirectory)
+                  touch kubeconfig
+                  terraform init
+                  export TF_WORKSPACE=$TF_VAR_client-$TF_VAR_product_version-$TF_VAR_metro
+                  terraform plan -compact-warnings -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
+                  terraform apply -auto-approve -compact-warnings -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
+                failOnStdErr: true
+                targetType: inline
+                workingDirectory: $(Build.SourcesDirectory)

@@ -1,4 +1,4 @@
-variable "bucket" {
+variable "secret_bucket" {
   type = string
 }
 
