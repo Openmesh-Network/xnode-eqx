@@ -1,4 +1,6 @@
 resource "null_resource" "kubeconfig_to_s3" {
+  depends_on = [module.multiarch-k8s]
+
   for_each = local.secrets
 
   provisioner "local-exec" {
@@ -10,6 +12,4 @@ resource "null_resource" "kubeconfig_to_s3" {
     }
     command = "chmod +x ${path.module}/scripts/copy_to_s3.sh; ${path.module}/scripts/copy_to_s3.sh"
   }
-
-  depends_on = [module.multiarch-k8s]
 }
