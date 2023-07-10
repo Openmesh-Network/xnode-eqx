@@ -45,10 +45,14 @@ variable "metro" {
   default     = "da"
 }
 
+module "shortlived-kube-token" {
+  source = "git@github.com:L3A-Protocol/kube-token.git"
+}
 
 module "multiarch-k8s" {
   #source = "git@github.com:L3A-Protocol/k8s-eqx-module.git?ref=v0.0.2-beta.1"
   source = "git@github.com:L3A-Protocol/k8s-eqx-module.git"
+  depends_on = [module.shortlived-kube-token]
 
   auth_token = var.auth_token
   project_id = random_string.project_id.result
@@ -63,7 +67,7 @@ module "multiarch-k8s" {
   kubernetes_version         = var.kubernetes_version
   workloads                  = var.workloads
   gh_secrets                 = var.gh_secrets
-  shortlived_kube_token      = var.shortlived_kube_token
+  shortlived_kube_token      = var.shortlived_kube_token != "" ? var.shortlived_kube_token : module.shortlived-kube-token.token
 }
 
 provider "equinix" {
