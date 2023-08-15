@@ -2,6 +2,10 @@ variable "aws_role_arn" {
   type = string
 }
 
+variable "client_name" {
+  type = string
+}
+
 variable "domain_name" {
   type = string
 }

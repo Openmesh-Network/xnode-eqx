@@ -26,7 +26,7 @@ variable "count_arm" {
 variable "cluster_name" {
   type        = string
   description = "Name of your cluster. Alpha-numeric and hyphens only, please."
-  default     = "metal-multiarch-k8s"
+  default     = ""
 }
 
 variable "product_version" {
@@ -59,8 +59,7 @@ module "multiarch-k8s" {
   metro      = var.metro
   count_arm  = var.count_arm
   count_x86  = var.count_x86
-  #cluster_name = var.cluster_name
-  cluster_name = random_string.project_id.result
+  cluster_name = var.cluster_name != "" ? var.cluster_name : random_string.project_id.result
   ccm_enabled  = var.ccm_enabled
   #===
   equinix_metal_project_name = "${local.equinix_metal_project_prefix_name}-${var.product_version}-${random_string.project_id.result}"
