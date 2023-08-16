@@ -23,7 +23,6 @@ resource "null_resource" "copy_host_secrets_to_s3" {
       aws_role_arn = var.aws_role_arn
       path         = "${terraform.workspace}/${local.equinix_metal_project_prefix_name}-${var.product_version}-${random_string.project_id.result}"
       file         = "${var.cluster_name != "" ? var.cluster_name : random_string.project_id.result}-x86-blue-0${count.index}_secret.asc"
-      #file         = "zwer84-x86-blue-0${count.index}_secret.asc"
       bucket       = var.secret_bucket
     }
     command = "chmod +x ${path.module}/scripts/copy_to_s3.sh; ${path.module}/scripts/copy_to_s3.sh"
