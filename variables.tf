@@ -1,5 +1,30 @@
+variable "_01_base_services" {
+  default = []
+}
+
+variable "_02_base_services" {
+  default = []
+}
+
+variable "_03_confluent_services" {
+  default = []
+}
+
+variable "_04_observability_services" {
+  default = []
+}
+
+variable "_10_l3a_services" {
+  default = []
+}
+
 variable "aws_role_arn" {
   type = string
+}
+
+variable "check_status" {
+  type = bool
+  default = false
 }
 
 variable "client_name" {
@@ -21,9 +46,14 @@ variable "secret_bucket" {
   type = string
 }
 
+variable "service" {
+  default = {}
+}
+
 variable "shortlived_kube_token" {
   type    = string
   default = ""
 }
 
 variable "workloads" {}
+variable "features" {}
