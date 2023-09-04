@@ -63,6 +63,7 @@ module "multiarch-k8s" {
   ccm_enabled  = var.ccm_enabled
   #===
   equinix_metal_project_name = "${local.equinix_metal_project_prefix_name}-${var.product_version}-${random_string.project_id.result}"
+  features                   = var.features
   kubernetes_version         = var.kubernetes_version
   workloads                  = var.workloads
   gh_secrets                 = var.gh_secrets

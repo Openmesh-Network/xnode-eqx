@@ -5,12 +5,14 @@ data "aws_route53_zone" "selected" {
   private_zone = false
 }
 
-resource "aws_route53_record" "query" {
+resource "aws_route53_record" "first_ip" {
   provider = aws.apse2
   depends_on = [module.multiarch-k8s]
 
+  for_each = toset(["query", "stats", "ws"])
+
   zone_id = data.aws_route53_zone.selected.id
-  name    = "query.${resource.random_string.project_id.result}.${var.domain_name}"
+  name    = "${each.key}.${resource.random_string.project_id.result}.${var.domain_name}"
   type    = "A"
   ttl     = 300
   records = [module.multiarch-k8s.first_ip]
