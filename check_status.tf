@@ -4,7 +4,6 @@ resource "null_resource" "check_status" {
 
   provisioner "local-exec" {
     environment = {
-      kubernetes_api_address = module.multiarch-k8s.kubernetes_api_address
       command = "kubectl rollout status -n ${each.value.namespace} ${each.value.type}/${each.value.name}"
     }
     command = "chmod +x ${path.module}/scripts/check_status.sh; ${path.module}/scripts/check_status.sh"

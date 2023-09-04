@@ -11,4 +11,5 @@ export AWS_SECRET_KEY=$(jq -r ".Credentials.SecretAccessKey" <<< $STS)
 export AWS_SESSION_TOKEN=$(jq -r ".Credentials.SessionToken" <<< $STS)
 export AWS_SECURITY_TOKEN=$(jq -r ".Credentials.SessionToken" <<< $STS)
 
-aws s3 cp $file s3://$bucket/$path/$file
+if [ $1 == "upload" ]; then aws s3 cp $file s3://$bucket/$path/$file; fi
+if [ $1 == "download" ]; then aws s3 cp s3://$bucket/$path/$file $file; fi
