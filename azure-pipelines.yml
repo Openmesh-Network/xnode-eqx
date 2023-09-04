@@ -10,6 +10,7 @@ variables:
   - group: l3a
 
 resources:
+  #https://github.com/MicrosoftDocs/azure-devops-docs/blob/main/docs/pipelines/process/resources.md#define-a-webhooks-resource
   webhooks:
     - webhook: settings 
       connection: supernode-webhook
@@ -38,7 +39,7 @@ stages:
                 script: |
                   echo "${{ build.aws_role_arn }}"
                   echo "${{ build.ccm_enabled }}"
-                  echo "${{ build.client }}"
+                  echo "${{ build.client_name }}"
                   echo "${{ build.count_x86 }}"
                   echo $(TF_VAR_domain_name)
                   echo "${{ build.metro }}"
@@ -89,7 +90,7 @@ stages:
                   export TF_VAR_auth_token="${{ build.auth_token }}"
                   export TF_VAR_aws_role_arn="${{ build.aws_role_arn }}"
                   export TF_VAR_ccm_enabled="${{ build.ccm_enabled }}"
-                  export TF_VAR_client="${{ build.client }}"
+                  export TF_VAR_client_name="${{ build.client_name }}"
                   export TF_VAR_count_x86="${{ build.count_x86 }}"
                   export TF_VAR_domain_name=$(TF_VAR_domain_name)
                   export TF_VAR_metro="${{ build.metro }}"
@@ -99,7 +100,7 @@ stages:
 
                   touch kubeconfig
                   terraform init
-                  export TF_WORKSPACE=$TF_VAR_client-$TF_VAR_product_version-$TF_VAR_metro
+                  export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
                   terraform plan -compact-warnings -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
                   terraform apply -auto-approve -compact-warnings -var-file=./workloads.tfvars -var-file=$(gh_secrets.secureFilePath)
                 failOnStdErr: true
