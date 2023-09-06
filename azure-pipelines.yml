@@ -53,14 +53,14 @@ stages:
     pool: 
       vmImage: ubuntu-latest
     jobs:
-      - job: 'stageMustHaveOneJobWithNoDependencies'
+      - job: 'aStageMustHaveOneJob'
         steps:
           - task: Bash@3
             displayName: ''
             inputs:
               targetType: 'inline'
               script: |
-                echo "stageMustHaveOneJobWithNoDependencies"
+                echo "a stage must have one job with no dependencies"
       - ${{ each build in parameters.settings.builds }}:
         - job: 'planBuild'
           steps:
@@ -160,10 +160,10 @@ stages:
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
 
-                  terraform taint 'null_resource.download_defined_secrets_from_s3["kubeconfig"]'
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
+                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   kubectl get all
@@ -210,10 +210,10 @@ stages:
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
 
-                  terraform taint 'null_resource.download_defined_secrets_from_s3["kubeconfig"]'
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
+                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   kubectl get all
@@ -261,10 +261,10 @@ stages:
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
 
-                  terraform taint 'null_resource.download_defined_secrets_from_s3["kubeconfig"]'
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
+                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   kubectl get all
@@ -313,10 +313,10 @@ stages:
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
 
-                  terraform taint 'null_resource.download_defined_secrets_from_s3["kubeconfig"]'
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
+                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   kubectl get all
@@ -366,10 +366,10 @@ stages:
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
 
-                  terraform taint 'null_resource.download_defined_secrets_from_s3["kubeconfig"]'
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
+                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   kubectl get all
