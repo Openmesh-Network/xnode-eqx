@@ -36,7 +36,8 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                echo "##vso[build.addbuildtag]dummyBuildTag"
+                echo "${{ parameters.settings.adoBuildTag }}"
+                echo "##vso[build.addbuildtag]${{ parameters.settings.adoBuildTag }}"
           - ${{ each build in parameters.settings.builds }}:
             - task: Bash@3
               displayName: ''
