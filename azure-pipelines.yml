@@ -31,6 +31,12 @@ stages:
     jobs:
       - job: 'echoParams'
         steps:
+          - task: Bash@3
+            displayName: ''
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "##vso[build.addbuildtag]dummyBuildTag"
           - ${{ each build in parameters.settings.builds }}:
             - task: Bash@3
               displayName: ''
@@ -53,7 +59,7 @@ stages:
     pool: 
       vmImage: ubuntu-latest
     jobs:
-      - job: 'aStageMustHaveOneJob'
+      - job: 'aStageMustHaveOneJobWithNoDependencies'
         steps:
           - task: Bash@3
             displayName: ''
@@ -166,7 +172,6 @@ stages:
                                   -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
-                  kubectl get all
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
@@ -216,7 +221,6 @@ stages:
                                   -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
-                  kubectl get all
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
@@ -267,7 +271,6 @@ stages:
                                   -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
-                  kubectl get all
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
@@ -319,7 +322,6 @@ stages:
                                   -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
-                  kubectl get all
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
@@ -372,7 +374,6 @@ stages:
                                   -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
                                   -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
-                  kubectl get all
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
