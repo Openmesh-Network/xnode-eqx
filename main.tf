@@ -51,14 +51,14 @@ module "shortlived-kube-token" {
 
 module "multiarch-k8s" {
   #source = "git@github.com:L3A-Protocol/k8s-eqx-module.git?ref=v0.0.2-beta.1"
-  source = "git@github.com:L3A-Protocol/k8s-eqx-module.git"
+  source     = "git@github.com:L3A-Protocol/k8s-eqx-module.git"
   depends_on = [module.shortlived-kube-token]
 
-  auth_token = var.auth_token
-  project_id = random_string.project_id.result
-  metro      = var.metro
-  count_arm  = var.count_arm
-  count_x86  = var.count_x86
+  auth_token   = var.auth_token
+  project_id   = random_string.project_id.result
+  metro        = var.metro
+  count_arm    = var.count_arm
+  count_x86    = var.count_x86
   cluster_name = var.cluster_name != "" ? var.cluster_name : random_string.project_id.result
   ccm_enabled  = var.ccm_enabled
   #===

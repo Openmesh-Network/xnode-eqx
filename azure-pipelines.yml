@@ -60,14 +60,14 @@ stages:
     pool: 
       vmImage: ubuntu-latest
     jobs:
-      - job: 'aStageMustHaveOneJobWithNoDependencies'
+      - job: 'aStageMustHaveOneJob'
         steps:
           - task: Bash@3
             displayName: ''
             inputs:
               targetType: 'inline'
               script: |
-                echo "a stage must have one job with no dependencies"
+                echo "a stage must have one job (with no dependencies)"
       - ${{ each build in parameters.settings.builds }}:
         - job: 'planBuild'
           steps:
@@ -83,17 +83,18 @@ stages:
                 addEntryToConfig: true
                 configHostname: 'github.com'
                 configHostAlias: 'github.com'
+
             - task: DownloadSecureFile@1
               name: gh_secrets
               displayName: 'secrets tfvars'
               inputs:
                 secureFile: 'gh_secrets.tfvars'
 
-            - task: DownloadSecureFile@1
-              name: open_server
-              displayName: 'open server'
-              inputs:
-                secureFile: 'open_server.sh'
+            #- task: DownloadSecureFile@1
+            #  name: open_server
+            #  displayName: 'open server'
+            #  inputs:
+            #    secureFile: 'open_server.sh'
 
             - task: AWSShellScript@1
               name: terraformPlanApply
@@ -335,7 +336,7 @@ stages:
                 workingDirectory: $(Build.SourcesDirectory)
 
             - task: AWSShellScript@1
-              name: checkStatusL3a
+              name: checkStatusOpenmesh
               inputs:
                 awsCredentials: aws-apl
                 regionName: ap-southeast-2
@@ -382,7 +383,63 @@ stages:
                                   -var-file 'services/02-base-services.tfvars' \
                                   -var-file 'services/03-confluent-services.tfvars' \
                                   -var-file 'services/04-observability-services.tfvars' \
-                                  -var-file 'services/10-l3a-services.tfvars'
+                                  -var-file 'services/10-openmesh-services.tfvars'
+                failOnStdErr: true
+                targetType: inline
+                workingDirectory: $(Build.SourcesDirectory)
+
+            - task: AWSShellScript@1
+              name: checkStatusOutput
+              inputs:
+                awsCredentials: aws-apl
+                regionName: ap-southeast-2
+                scriptType: inline
+                inlineScript: |
+                  sudo apt-get install knockd
+
+                  export TF_VAR_auth_token="${{ build.auth_token }}"
+                  export TF_VAR_aws_role_arn="${{ build.aws_role_arn }}"
+                  export TF_VAR_ccm_enabled="${{ build.ccm_enabled }}"
+                  export TF_VAR_client_name="${{ build.client_name }}"
+                  export TF_VAR_count_x86="${{ build.count_x86 }}"
+                  export TF_VAR_domain_name=$(TF_VAR_domain_name)
+                  export TF_VAR_metro="${{ build.metro }}"
+                  export TF_VAR_product_version="${{ build.product_version }}"
+                  export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
+                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export KUBECONFIG=$PWD/kubeconfig
+
+                  #use single quotes with complex objects!
+                  export features='${{ convertToJson(build.features) }}'
+                  jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
+
+                  touch kubeconfig
+                  terraform init
+                  export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
+
+                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
+                  echo $kubernetes_api_address
+
+                  echo "status run with additional output"
+                  mv additional_outputs.tf.disabled additional_outputs.tf
+
+                  knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
+                  knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
+
+                  terraform apply -auto-approve -compact-warnings \
+                                  -var-file=./workloads.tfvars \
+                                  -var-file=$(gh_secrets.secureFilePath) \
+                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
+                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
+
+                  terraform apply -auto-approve -compact-warnings \
+                                  -var-file=./workloads.tfvars \
+                                  -var-file=$(gh_secrets.secureFilePath) \
+                                  -var-file 'services/01-base-services.tfvars' \
+                                  -var-file 'services/02-base-services.tfvars' \
+                                  -var-file 'services/03-confluent-services.tfvars' \
+                                  -var-file 'services/04-observability-services.tfvars' \
+                                  -var-file 'services/10-openmesh-services.tfvars'
                 failOnStdErr: true
                 targetType: inline
                 workingDirectory: $(Build.SourcesDirectory)

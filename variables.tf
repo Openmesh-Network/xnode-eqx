@@ -14,7 +14,7 @@ variable "_04_observability_services" {
   default = []
 }
 
-variable "_10_l3a_services" {
+variable "_10_openmesh_services" {
   default = []
 }
 
@@ -23,7 +23,7 @@ variable "aws_role_arn" {
 }
 
 variable "check_status" {
-  type = bool
+  type    = bool
   default = false
 }
 
@@ -38,7 +38,7 @@ variable "domain_name" {
 variable "gh_secrets" {}
 
 variable "kubernetes_version" {
-  type = string
+  type    = string
   default = "1.25.10-00"
 }
 

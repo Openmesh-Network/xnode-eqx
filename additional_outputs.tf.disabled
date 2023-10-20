@@ -1,0 +1,44 @@
+output "network_cidr" {
+  description = "cidr_notation"
+  value       = module.multiarch-k8s.network_cidr
+}
+
+output "first_ip" {
+  description = "first_ip"
+  value       = module.multiarch-k8s.first_ip
+}
+
+output "client_name" {
+  description = "client_name"
+  value       = var.client_name
+}
+
+output "product_name" {
+  description = "product_name"
+  value       = local.equinix_metal_project_prefix_name
+}
+
+output "product_version" {
+  description = "product_version"
+  value       = var.product_version
+}
+
+output "project_id" {
+  description = "project_id"
+  value       = random_string.project_id.result
+}
+
+output "workspace" {
+  description = "terraform_workspace"
+  value       = terraform.workspace
+}
+
+output "pythia_url" {
+  description = "pythia url"
+  value       = "https://query.${random_string.project_id.result}.${var.domain_name}"
+}
+
+output "stats_url" {
+  description = "stats_url"
+  value       = "https://stats.${random_string.project_id.result}.${var.domain_name}"
+}

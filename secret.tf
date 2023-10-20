@@ -28,7 +28,7 @@ resource "null_resource" "copy_defined_secrets_to_s3" {
 
 resource "null_resource" "copy_host_secrets_to_s3" {
   depends_on = [module.multiarch-k8s]
-  count = var.count_x86
+  count      = var.count_x86
 
   provisioner "local-exec" {
     environment = {

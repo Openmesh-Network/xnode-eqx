@@ -1,6 +1,6 @@
 resource "null_resource" "check_status" {
   depends_on = [module.multiarch-k8s]
-  for_each = { for service in local.services : service.name => service }
+  for_each   = { for service in local.services : service.name => service }
 
   provisioner "local-exec" {
     environment = {
