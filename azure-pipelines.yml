@@ -53,6 +53,7 @@ stages:
                   echo "${{ build.product_version }}"
                   echo "${{ build.kubernetes_version }}"
                   echo "${{ build.secret_bucket }}"
+                  echo $(TF_VAR_secret_bucket)
                   #use single quotes with complex objects!
                   echo '${{ convertToJson(build.features) }}'
 
@@ -112,7 +113,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
@@ -151,7 +152,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export KUBECONFIG=$PWD/kubeconfig
 
                   #use single quotes with complex objects!
@@ -200,7 +201,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export KUBECONFIG=$PWD/kubeconfig
 
                   #use single quotes with complex objects!
@@ -250,7 +251,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export KUBECONFIG=$PWD/kubeconfig
 
                   #use single quotes with complex objects!
@@ -301,7 +302,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export KUBECONFIG=$PWD/kubeconfig
 
                   #use single quotes with complex objects!
@@ -353,7 +354,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export KUBECONFIG=$PWD/kubeconfig
 
                   #use single quotes with complex objects!
@@ -406,7 +407,7 @@ stages:
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
-                  export TF_VAR_secret_bucket="${{ build.secret_bucket }}"
+                  export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export KUBECONFIG=$PWD/kubeconfig
 
                   #use single quotes with complex objects!
