@@ -55,5 +55,11 @@ variable "shortlived_kube_token" {
   default = ""
 }
 
+variable "organization_id" {
+  type    = string
+  default = null
+  sensitive = true
+}
+
 variable "workloads" {}
 variable "features" {}

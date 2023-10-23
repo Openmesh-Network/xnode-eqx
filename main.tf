@@ -68,6 +68,7 @@ module "multiarch-k8s" {
   workloads                  = var.workloads
   gh_secrets                 = var.gh_secrets
   shortlived_kube_token      = var.shortlived_kube_token != "" ? var.shortlived_kube_token : module.shortlived-kube-token.token
+  organization_id            = var.organization_id != "" ? var.organization_id : null
 }
 
 provider "equinix" {
