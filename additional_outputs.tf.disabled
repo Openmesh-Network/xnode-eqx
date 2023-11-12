@@ -38,7 +38,7 @@ output "pythia_url" {
   value       = "https://query.${random_string.project_id.result}.${var.domain_name}"
 }
 
-output "stats_url" {
-  description = "stats_url"
-  value       = "https://stats.${random_string.project_id.result}.${var.domain_name}"
+output "stats_urls" {
+  description = "stats_urls"
+  value       = [ for g in local.grafana : "https://stats.${var.cluster_name != "" ? var.cluster_name : random_string.project_id.result}.${var.domain_name}/public-dashboards/${random_id.grafana_access_tokens[g].hex}" ]
 }
