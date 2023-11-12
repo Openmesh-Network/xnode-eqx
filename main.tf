@@ -34,15 +34,16 @@ variable "product_version" {
   description = "L3a major product version"
 }
 
-#variable "project_id" {
-#  type        = string
-#  description = "Equinix Metal Project ID"
-#}
+variable "project_id" {
+  type        = string
+  description = "Equinix Metal Project ID"
+  default     = ""
+}
 
 variable "metro" {
   type        = string
   description = "Equinix Metal Metro"
-  default     = "da"
+  default     = "ny"
 }
 
 module "shortlived-kube-token" {
@@ -55,20 +56,22 @@ module "multiarch-k8s" {
   depends_on = [module.shortlived-kube-token]
 
   auth_token   = var.auth_token
-  project_id   = random_string.project_id.result
-  metro        = var.metro
-  count_arm    = var.count_arm
-  count_x86    = var.count_x86
-  cluster_name = var.cluster_name != "" ? var.cluster_name : random_string.project_id.result
   ccm_enabled  = var.ccm_enabled
+  cluster_name = var.cluster_name != "" ? var.cluster_name : random_string.project_id.result
+  count_arm    = var.single_xnode == true ? 0 : var.count_arm
+  count_x86    = var.single_xnode == true ? 0 : var.count_x86
+  metro        = var.metro
+  project_id   = var.project_id != "" ? var.project_id : random_string.project_id.result
   #===
-  equinix_metal_project_name = "${local.equinix_metal_project_prefix_name}-${var.product_version}-${random_string.project_id.result}"
+  equinix_metal_project_name = "${local.equinix_metal_project_prefix_name}-${var.product_version}-${var.cluster_name != "" ? var.cluster_name : random_string.project_id.result}"
   features                   = var.features
-  kubernetes_version         = var.kubernetes_version
-  workloads                  = var.workloads
   gh_secrets                 = var.gh_secrets
-  shortlived_kube_token      = var.shortlived_kube_token != "" ? var.shortlived_kube_token : module.shortlived-kube-token.token
+  kubernetes_version         = var.kubernetes_version
   organization_id            = var.organization_id != "" ? var.organization_id : null
+  shortlived_kube_token      = var.shortlived_kube_token != "" ? var.shortlived_kube_token : module.shortlived-kube-token.token
+  single_xnode               = var.single_xnode
+  workloads                  = var.workloads
+  grafana                    = [ for g in local.grafana : { name = g, token = random_id.grafana_access_tokens[g].hex }]
 }
 
 provider "equinix" {

@@ -63,3 +63,8 @@ variable "organization_id" {
 
 variable "workloads" {}
 variable "features" {}
+
+variable "single_xnode" {
+  type    = bool
+  default = false
+}

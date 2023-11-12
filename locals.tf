@@ -14,4 +14,8 @@ locals {
     var._04_observability_services,
     var._10_openmesh_services
   )
+  grafana = [
+    "openmesh",
+    "kafka"
+  ]
 }

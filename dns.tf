@@ -12,7 +12,7 @@ resource "aws_route53_record" "first_ip" {
   for_each = toset(["query", "stats", "ws"])
 
   zone_id         = data.aws_route53_zone.selected.id
-  name            = "${each.key}.${resource.random_string.project_id.result}.${var.domain_name}"
+  name            = "${each.key}.${var.project_id != "" ? var.project_id : random_string.project_id.result}.${var.domain_name}"
   type            = "A"
   ttl             = 300
   records         = [module.multiarch-k8s.first_ip]
