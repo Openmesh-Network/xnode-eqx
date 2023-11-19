@@ -61,9 +61,11 @@ module "multiarch-k8s" {
   count_arm    = var.single_xnode == true ? 0 : var.count_arm
   count_x86    = var.single_xnode == true ? 0 : var.count_x86
   metro        = var.metro
-  project_id   = var.project_id != "" ? var.project_id : random_string.project_id.result
+  project_id   = var.project_id != "" ? var.project_id : equinix_metal_project.new_project.id
   #===
   equinix_metal_project_name = "${local.equinix_metal_project_prefix_name}-${var.product_version}-${var.cluster_name != "" ? var.cluster_name : random_string.project_id.result}"
+  metal_create_project       = false
+  kubernetes_lb_block        = equinix_metal_reserved_ip_block.kubernetes.cidr_notation
   features                   = var.features
   gh_secrets                 = var.gh_secrets
   kubernetes_version         = var.kubernetes_version
@@ -72,6 +74,24 @@ module "multiarch-k8s" {
   single_xnode               = var.single_xnode
   workloads                  = var.workloads
   grafana                    = [ for g in local.grafana : { name = g, token = random_id.grafana_access_tokens[g].hex }]
+}
+
+resource "equinix_metal_project" "new_project" {
+  name            = "${local.equinix_metal_project_prefix_name}-${var.product_version}-${var.cluster_name != "" ? var.cluster_name : random_string.project_id.result}"
+  organization_id = var.organization_id != "" ? var.organization_id : null
+
+  # Kube-vip will enable BGP if not enabled, Terraform must match the settings
+  bgp_config {
+    deployment_type = "local"
+    md5             = ""
+    asn             = 65000
+  }
+}
+
+resource "equinix_metal_reserved_ip_block" "kubernetes" {
+  project_id = equinix_metal_project.new_project.id
+  metro      = var.metro != "" ? var.metro : null
+  quantity   = 4
 }
 
 provider "equinix" {

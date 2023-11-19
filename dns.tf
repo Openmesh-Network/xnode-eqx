@@ -7,7 +7,7 @@ data "aws_route53_zone" "selected" {
 
 resource "aws_route53_record" "first_ip" {
   provider   = aws.apse2
-  depends_on = [module.multiarch-k8s]
+  #depends_on = [module.multiarch-k8s]
 
   for_each = toset(["query", "stats", "ws"])
 
