@@ -1,6 +1,6 @@
 workloads = {
   cni_cidr             = "192.168.0.0/16"
-  cni_workloads        = ["https://projectcalico.docs.tigera.io/archive/v3.24/manifests/tigera-operator.yaml", "https://projectcalico.docs.tigera.io/archive/v3.24/manifests/custom-resources.yaml"]
+  cni_workloads        = ["https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/tigera-operator.yaml", "https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/custom-resources.yaml"]
   ceph_common          = "https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/common.yaml"
   ceph_operator        = "https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/operator.yaml"
   ceph_cluster_minimal = "https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/cluster-minimal.yaml"
