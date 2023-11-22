@@ -58,7 +58,7 @@ resource "null_resource" "copy_controller_secrets_to_s3" {
 resource "null_resource" "download_defined_secrets_from_s3" {
   depends_on = [module.multiarch-k8s, null_resource.copy_controller_secrets_to_s3, null_resource.modify_kubeconfig]
 
-  for_each = local.secrets
+  for_each = jsondecode(var.download_defined_secrets_from_s3)
 
   provisioner "local-exec" {
     environment = {

@@ -68,3 +68,7 @@ variable "single_xnode" {
   type    = bool
   default = false
 }
+
+variable "download_defined_secrets_from_s3" {
+  default = "{}"
+}

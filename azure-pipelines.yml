@@ -48,16 +48,16 @@ stages:
                   echo "${{ build.ccm_enabled }}"
                   echo "${{ build.client_name }}"
                   echo "${{ build.count_x86 }}"
-                  echo $(TF_VAR_domain_name)
+                  echo "${{ build.kubernetes_version }}"
                   echo "${{ build.metro }}"
                   echo "${{ build.product_version }}"
-                  echo "${{ build.kubernetes_version }}"
-                  echo "${{ build.secret_bucket }}"
+                  echo "${{ build.single_xnode }}"
+                  echo $(TF_VAR_domain_name)
                   echo $(TF_VAR_secret_bucket)
                   #use single quotes with complex objects!
                   echo '${{ convertToJson(build.features) }}'
 
-  - stage: plan
+  - stage: planBuild
     pool: 
       vmImage: ubuntu-latest
     jobs:
@@ -110,18 +110,24 @@ stages:
                   export TF_VAR_client_name="${{ build.client_name }}"
                   export TF_VAR_count_x86="${{ build.count_x86 }}"
                   export TF_VAR_domain_name=$(TF_VAR_domain_name)
+                  export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_metro="${{ build.metro }}"
                   export TF_VAR_product_version="${{ build.product_version }}"
-                  export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
+                  echo "status run with additional output"
+                  cat additional_outputs.tf.disabled > additional_outputs.tf
+
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
+
                   terraform plan -compact-warnings \
                                  -var-file=./workloads.tfvars \
                                  -var-file=$(gh_secrets.secureFilePath)
@@ -129,6 +135,8 @@ stages:
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath)
+
+                  rm -rf additional_outputs.tf
 
                 failOnStdErr: true
                 targetType: inline
@@ -153,18 +161,18 @@ stages:
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
-                  export KUBECONFIG=$PWD/kubeconfig
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
-
-                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
-                  echo $kubernetes_api_address
+                  export TF_VAR_download_defined_secrets_from_s3='{"kubeconfig": {"file_name": "kubeconfig"}, "metal_key": { "file_name" : "metal_key"}}'
+                  export kubernetes_api_address=$(terraform output --raw kubernetes_api_address)
 
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
@@ -173,7 +181,9 @@ stages:
                                   -var-file=./workloads.tfvars \
                                   -var-file=$(gh_secrets.secureFilePath) \
                                   -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
-                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
+                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
+                                  -replace='null_resource.download_defined_secrets_from_s3["metal_key"]' \
+                                  -target='null_resource.download_defined_secrets_from_s3["metal_key"]'
 
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
@@ -202,27 +212,21 @@ stages:
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
-                  export KUBECONFIG=$PWD/kubeconfig
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
-
-                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
-                  echo $kubernetes_api_address
+                  export TF_VAR_download_defined_secrets_from_s3='{"kubeconfig": {"file_name": "kubeconfig"}, "metal_key": { "file_name" : "metal_key"}}'
+                  export kubernetes_api_address=$(terraform output --raw kubernetes_api_address)
 
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
-
-                  terraform apply -auto-approve -compact-warnings \
-                                  -var-file=./workloads.tfvars \
-                                  -var-file=$(gh_secrets.secureFilePath) \
-                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
-                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
@@ -252,27 +256,22 @@ stages:
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
-                  export KUBECONFIG=$PWD/kubeconfig
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
-
-                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
+                  export TF_VAR_download_defined_secrets_from_s3='{"kubeconfig": {"file_name": "kubeconfig"}, "metal_key": { "file_name" : "metal_key"}}'
+                  export kubernetes_api_address=$(terraform output --raw kubernetes_api_address)
                   echo $kubernetes_api_address
 
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
-
-                  terraform apply -auto-approve -compact-warnings \
-                                  -var-file=./workloads.tfvars \
-                                  -var-file=$(gh_secrets.secureFilePath) \
-                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
-                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
@@ -303,27 +302,22 @@ stages:
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
-                  export KUBECONFIG=$PWD/kubeconfig
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
-
-                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
+                  export TF_VAR_download_defined_secrets_from_s3='{"kubeconfig": {"file_name": "kubeconfig"}, "metal_key": { "file_name" : "metal_key"}}'
+                  export kubernetes_api_address=$(terraform output --raw kubernetes_api_address)
                   echo $kubernetes_api_address
 
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
-
-                  terraform apply -auto-approve -compact-warnings \
-                                  -var-file=./workloads.tfvars \
-                                  -var-file=$(gh_secrets.secureFilePath) \
-                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
-                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
@@ -355,27 +349,21 @@ stages:
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
-                  export KUBECONFIG=$PWD/kubeconfig
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
-
-                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
-                  echo $kubernetes_api_address
+                  export TF_VAR_download_defined_secrets_from_s3='{"kubeconfig": {"file_name": "kubeconfig"}, "metal_key": { "file_name" : "metal_key"}}'
+                  export kubernetes_api_address=$(terraform output --raw kubernetes_api_address)
 
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
-
-                  terraform apply -auto-approve -compact-warnings \
-                                  -var-file=./workloads.tfvars \
-                                  -var-file=$(gh_secrets.secureFilePath) \
-                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
-                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
@@ -408,30 +396,24 @@ stages:
                   export TF_VAR_product_version="${{ build.product_version }}"
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
-                  export KUBECONFIG=$PWD/kubeconfig
+                  export TF_VAR_single_xnode="${{ build.single_xnode }}"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
                   jq --argjson x "$features" '{features:$x}' <<< '{}' > terraform.tfvars.json
 
+                  echo "status run with additional output"
+                  cat additional_outputs.tf.disabled > additional_outputs.tf
+
                   touch kubeconfig
+                  export KUBECONFIG=$PWD/kubeconfig
                   terraform init
                   export TF_WORKSPACE=$TF_VAR_client_name-$TF_VAR_product_version-$TF_VAR_metro
-
-                  kubernetes_api_address=$(sed -e 's/^"//' -e 's/"$//' <<< $(terraform output kubernetes_api_address))
-                  echo $kubernetes_api_address
-
-                  echo "status run with additional output"
-                  mv additional_outputs.tf.disabled additional_outputs.tf
+                  export TF_VAR_download_defined_secrets_from_s3='{"kubeconfig": {"file_name": "kubeconfig"}, "metal_key": { "file_name" : "metal_key"}}'
+                  export kubernetes_api_address=$(terraform output --raw kubernetes_api_address)
 
                   knock -d 100 $kubernetes_api_address 600:udp 606:udp 666:udp || echo "knock failed"
                   knock -d 200 $kubernetes_api_address 600:udp 606:udp 666:udp && echo "knock succeeded"
-
-                  terraform apply -auto-approve -compact-warnings \
-                                  -var-file=./workloads.tfvars \
-                                  -var-file=$(gh_secrets.secureFilePath) \
-                                  -replace='null_resource.download_defined_secrets_from_s3["kubeconfig"]' \
-                                  -target='null_resource.download_defined_secrets_from_s3["kubeconfig"]'
 
                   terraform apply -auto-approve -compact-warnings \
                                   -var-file=./workloads.tfvars \
