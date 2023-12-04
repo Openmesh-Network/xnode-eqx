@@ -156,7 +156,7 @@ stages:
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export TF_VAR_single_xnode="${{ build.single_xnode }}"
-                  export knock_pattern=$(knock_pattern)
+                  export knock_pattern="$(knock_pattern)"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
@@ -208,7 +208,7 @@ stages:
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export TF_VAR_single_xnode="${{ build.single_xnode }}"
-                  export knock_pattern=$(knock_pattern)
+                  export knock_pattern="$(knock_pattern)"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
@@ -253,7 +253,7 @@ stages:
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export TF_VAR_single_xnode="${{ build.single_xnode }}"
-                  export knock_pattern=$(knock_pattern)
+                  export knock_pattern="$(knock_pattern)"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
@@ -300,7 +300,7 @@ stages:
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export TF_VAR_single_xnode="${{ build.single_xnode }}"
-                  export knock_pattern=$(knock_pattern)
+                  export knock_pattern="$(knock_pattern)"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
@@ -348,7 +348,7 @@ stages:
                   export TF_VAR_kubernetes_version="${{ build.kubernetes_version }}"
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export TF_VAR_single_xnode="${{ build.single_xnode }}"
-                  export knock_pattern=$(knock_pattern)
+                  export knock_pattern="$(knock_pattern)"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
@@ -397,7 +397,7 @@ stages:
                   export TF_VAR_secret_bucket=$(TF_VAR_secret_bucket)
                   export TF_VAR_single_xnode="${{ build.single_xnode }}"
                   export knock_pattern=$(knock_pattern)
-                  export build_id=$(build.buildid)
+                  export knock_pattern="$(knock_pattern)"
 
                   #use single quotes with complex objects!
                   export features='${{ convertToJson(build.features) }}'
