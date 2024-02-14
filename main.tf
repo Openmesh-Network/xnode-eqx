@@ -47,12 +47,11 @@ variable "metro" {
 }
 
 module "shortlived-kube-token" {
-  source = "git@github.com:L3A-Protocol/kube-token.git"
+  source = "git@github.com:Openmesh-network/kube-token.git"
 }
 
 module "multiarch-k8s" {
-  #source = "git@github.com:L3A-Protocol/k8s-eqx-module.git?ref=v0.0.2-beta.1"
-  source     = "git@github.com:L3A-Protocol/k8s-eqx-module.git"
+  source     = "git@github.com:Openmesh-Network/k8s-eqx-module.git"
   depends_on = [module.shortlived-kube-token]
 
   auth_token   = var.auth_token
