@@ -1,0 +1,49 @@
+{
+  "features": [
+    {
+      "args": "--set image.repository=gdafund/collector --set image.tag=20230406.7",
+      "command": "helm upgrade --install",
+      "helmChartNameSuffix": "connector",
+      "helmRepoName": "openmesh-network",
+      "helmRepoUrl": "https://raw.githubusercontent.com/Openmesh-Network/gda-helm-repo/main/",
+      "ingress": {
+        "enabled": false,
+        "hostname": null
+      },
+      "namespace": "openmesh",
+      "workloads": [
+        "apollox"
+      ]
+    },
+    {
+      "args": "--set image.repository=gdafund/l3_atom_server --set image.tag=0.1.0",
+      "command": "helm upgrade --install",
+      "helmChartNameSuffix": "-app",
+      "helmRepoName": "openmesh-network",
+      "helmRepoUrl": "https://raw.githubusercontent.com/L3A-Protocol/gda-helm-repo/main/",
+      "ingress": {
+        "enabled": true,
+        "hostname": "ws"
+      },
+      "namespace": "openmesh",
+      "workloads": [
+        "websocketserver"
+      ]
+    },
+    {
+      "args": "--set image.repository=gdafund/l3_atom --set image.tag=0.1.0",
+      "command": "helm upgrade --install",
+      "helmChartNameSuffix": "-app",
+      "helmRepoName": "openmesh-network",
+      "helmRepoUrl": "https://raw.githubusercontent.com/Openmesh-Network/gda-helm-repo/main/",
+      "ingress": {
+        "enabled": false,
+        "hostname": null
+      },
+      "namespace": "openmesh",
+      "workloads": [
+        "streamprocessor"
+      ]
+    }
+  ]
+}
